@@ -4,7 +4,8 @@
   "description": "Ecommerce app Using the MongoDB driver and Express",
   "main": "mongomart.js",
   "scripts": {
-    "dev": "./node_modules/nodemon/bin/nodemon.js"
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
+    "import": "bash data/import.bash"
   },
   "dependencies": {
     "express": "~4.13.3",
