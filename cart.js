@@ -168,7 +168,7 @@ function CartDAO(database) {
 
     };
 
-
+    /* LAB-06 (Challenge)[OK] */
     this.updateQuantity = function(userId, itemId, quantity, callback) {
         "use strict";
 
@@ -188,15 +188,43 @@ function CartDAO(database) {
         * https://docs.mongodb.org/manual/reference/operator/update/positional/
         *
         */
-
-        var userCart = {
-            userId: userId,
-            items: []
+       
+        // Se 0, deletar documento
+        let update = {}
+        if(quantity == 0){
+            update = {
+                $pull: {
+                    items: {_id: itemId}
+                }
+            }
+        } else {
+            update = {
+                $set: {"items.$.quantity": quantity}
+            }
         }
-        var dummyItem = this.createDummyItem();
-        dummyItem.quantity = quantity;
-        userCart.items.push(dummyItem);
-        callback(userCart);
+
+        this.db.collection(this.COLLECTION_NAME).findOneAndUpdate({
+            userId, 
+            "items._id": itemId
+        },
+            update
+        , {
+            returnOriginal: false
+        }).then(result => {console.log('no then', result.value); callback(result.value)})
+          .catch(err => {
+            console.error(err);
+            callback(null);
+          })
+       
+
+        // var userCart = {
+        //     userId: userId,
+        //     items: []
+        // }
+        // var dummyItem = this.createDummyItem();
+        // dummyItem.quantity = quantity;
+        // userCart.items.push(dummyItem);
+        // callback(userCart);
 
         // TODO-lab7 Replace all code above (in this method).
 
