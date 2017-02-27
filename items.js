@@ -181,7 +181,7 @@ function ItemDAO(database) {
         // callback(numItems);
     }
 
-
+    /* LAB-02A [OK] */
     this.searchItems = function(query, page, itemsPerPage, callback) {
         "use strict";
 
@@ -207,27 +207,41 @@ function ItemDAO(database) {
          * this method, create a SINGLE text index on title, slogan, and
          * description. You should simply do this in the mongo shell.
          *
+         * **** INDEX criado ****
+             db.item.createIndex({
+                title: "text",
+                slogan: "text",
+                description: "text"
+            })
+         * *********************
          */
+        
+        this.db.collection(this.COLLECTION_NAME).find({
+            $text: {$search: query}
+        }).sort({_id: 1})
+          .skip(page*itemsPerPage)
+          .limit(itemsPerPage)
+          .toArray((err, items) => callback(items));
 
-        var item = this.createDummyItem();
-        var items = [];
-        for (var i=0; i<5; i++) {
-            items.push(item);
-        }
+        // var item = this.createDummyItem();
+        // var items = [];
+        // for (var i=0; i<5; i++) {
+        //     items.push(item);
+        // }
 
         // TODO-lab2A Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the items for the selected page
         // of search results to the callback.
-        callback(items);
+        // callback(items);
     }
 
-
+    /* LAB-02B [OK] */
     this.getNumSearchItems = function(query, callback) {
         "use strict";
 
-        var numItems = 0;
+        // var numItems = 0;
 
         /*
         * TODO-lab2B
@@ -240,9 +254,16 @@ function ItemDAO(database) {
         * Before implementing this method, ensure that you've already created
         * a SINGLE text index on title, slogan, and description. You should
         * simply do this in the mongo shell.
+        *
+        * **** Index criado nos comentários de searchItems
         */
 
-        callback(numItems);
+        this.db.collection(this.COLLECTION_NAME).find({
+            $text: {$search: query}
+        }).count()
+          .then(callback);
+
+        // callback(numItems);
     }
 
 
