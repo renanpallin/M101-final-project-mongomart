@@ -266,7 +266,7 @@ function ItemDAO(database) {
         // callback(numItems);
     }
 
-
+    /* LAB-03 [OK] */
     this.getItem = function(itemId, callback) {
         "use strict";
 
@@ -280,14 +280,20 @@ function ItemDAO(database) {
          *
          */
 
-        var item = this.createDummyItem();
+        this.db.collection(this.COLLECTION_NAME).findOne({
+            _id: itemId
+        }).then(callback)
+          .catch(console.error); // Usuário nem fica sabendo da merda,
+                                 // o que é ruim...
+
+        // var item = this.createDummyItem();
 
         // TODO-lab3 Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the matching item
         // to the callback.
-        callback(item);
+        // callback(item);
     }
 
 
