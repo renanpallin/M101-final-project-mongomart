@@ -23,7 +23,10 @@ function ItemDAO(database) {
     "use strict";
 
     this.db = database;
+    // this.COLLECTION_NAME = 'item';
+    Object.defineProperty(this, 'COLLECTION_NAME', { writable: false, value: 'item' });
 
+    /* LAB-01A [OK] */
     this.getCategories = function(callback) {
         "use strict";
 
@@ -51,26 +54,42 @@ function ItemDAO(database) {
         * to the callback.
         *
         */
+        this.db.collection(this.COLLECTION_NAME).aggregate([{
+            $group: {
+                _id: "$category",
+                num: {$sum: 1}
+            }
+        }]).toArray( (err, categories) => {
+            if (err) return console.error(err);
 
-        var categories = [];
-        var category = {
-            _id: "All",
-            num: 9999
-        };
-
-        categories.push(category)
-
+            var numAll = categories.reduce((prev, current) => {
+                let prevNum = 0;
+                if (prev instanceof Object)
+                    prevNum = prev.num;
+                else if (prev)
+                    prevNum = prev;
+                // console.log(prevNum, current.num);
+                return prevNum + current.num
+            })
+            // console.log("numAll", numAll);
+            categories.push({
+                _id: "All",
+                num: numAll
+            })
+            callback(categories)
+        })
         // TODO-lab1A Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the categories array to the
         // callback.
-        callback(categories);
-    }
+        // callback(categories);
+    }   
 
-
+    /* LAB-01B [OK] */
     this.getItems = function(category, page, itemsPerPage, callback) {
         "use strict";
+
 
         /*
          * TODO-lab1B
@@ -93,26 +112,40 @@ function ItemDAO(database) {
          * than you do for other categories.
          *
          */
+        let cursor;
+        if(category == "All")
+            cursor = this.db.collection(this.COLLECTION_NAME).find();
+        else
+            cursor = this.db.collection(this.COLLECTION_NAME).find({category});
 
-        var pageItem = this.createDummyItem();
-        var pageItems = [];
-        for (var i=0; i<5; i++) {
-            pageItems.push(pageItem);
-        }
+        cursor.sort({_id: 1})
+            .skip(page*itemsPerPage)
+            .limit(itemsPerPage)
+            .toArray((err, array) => {
+                if(err) return console.error(err);
+                // console.log("CHAMANDO CALLBACK", array);
+                callback(array);
+            });
+
+        // var pageItem = this.createDummyItem();
+        // var pageItems = [];
+        // for (var i=0; i<5; i++) {
+        //     pageItems.push(pageItem);
+        // }
 
         // TODO-lab1B Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the items for the selected page
         // to the callback.
-        callback(pageItems);
+        // callback(pageItems);
     }
 
-
+    /* LAB-01C [OK] */
     this.getNumItems = function(category, callback) {
         "use strict";
 
-        var numItems = 0;
+        // var numItems = 0;
 
         /*
          * TODO-lab1C:
@@ -128,10 +161,24 @@ function ItemDAO(database) {
          * of a call to the getNumItems() method.
          *
          */
+         /*
+          Saca só essa gambeta kkkkkkk 
+          Fiz só de zuera, nunca cogitei usar isso 
+          */
+         // this.getCategories(categories => {
+         //    callback(categories.filter(e =>{ return e._id === category})[0].num);
+         // })
+        
+        let cursor;
+        if(category == "All")
+            cursor = this.db.collection(this.COLLECTION_NAME).find();
+        else
+            cursor = this.db.collection(this.COLLECTION_NAME).find({category});
 
+        cursor.count().then(callback);
          // TODO Include the following line in the appropriate
          // place within your code to pass the count to the callback.
-        callback(numItems);
+        // callback(numItems);
     }
 
 
