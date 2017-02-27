@@ -62,15 +62,21 @@ function ItemDAO(database) {
         }]).toArray( (err, categories) => {
             if (err) return console.error(err);
 
-            var numAll = categories.reduce((prev, current) => {
-                let prevNum = 0;
-                if (prev instanceof Object)
-                    prevNum = prev.num;
-                else if (prev)
-                    prevNum = prev;
-                // console.log(prevNum, current.num);
-                return prevNum + current.num
-            })
+            /*
+            Com map antes do reduce, fica MUITO mais fácil
+             */
+            // var numAll = categories.reduce((prev, current) => {
+            //     let prevNum = 0;
+            //     if (prev instanceof Object)
+            //         prevNum = prev.num;
+            //     else if (prev)
+            //         prevNum = prev;
+            //     // console.log(prevNum, current.num);
+            //     return prevNum + current.num
+            // })
+            var numAll = categories.map(e => e.num).reduce((prev, current) => prev += current);
+
+            
             // console.log("numAll", numAll);
             categories.push({
                 _id: "All",
@@ -221,7 +227,10 @@ function ItemDAO(database) {
         }).sort({_id: 1})
           .skip(page*itemsPerPage)
           .limit(itemsPerPage)
-          .toArray((err, items) => callback(items));
+          .toArray((err, items) => {
+            if (err) return console.error(err);
+            callback(items);
+        });
 
         // var item = this.createDummyItem();
         // var items = [];
