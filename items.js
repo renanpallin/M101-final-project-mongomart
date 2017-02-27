@@ -236,7 +236,7 @@ function ItemDAO(database) {
         // of search results to the callback.
         // callback(items);
     }
-
+ 
     /* LAB-02B [OK] */
     this.getNumSearchItems = function(query, callback) {
         "use strict";
@@ -308,7 +308,7 @@ function ItemDAO(database) {
             });
     };
 
-
+    /* LAB-04 [OK] */
     this.addReview = function(itemId, comment, name, stars, callback) {
         "use strict";
 
@@ -323,23 +323,35 @@ function ItemDAO(database) {
          * "name", "comment", "stars", and "date".
          *
          */
+        
+        this.db.collection(this.COLLECTION_NAME).findOneAndUpdate({_id: itemId}, {
+            $push: {
+                reviews: {
+                    name,
+                    comment,
+                    stars,
+                    date: Date.now()
+                }
+            }
+        }).then(callback);
+        // callback();
 
-        var reviewDoc = {
-            name: name,
-            comment: comment,
-            stars: stars,
-            date: Date.now()
-        }
+        // var reviewDoc = {
+        //     name: name,
+        //     comment: comment,
+        //     stars: stars,
+        //     date: Date.now()
+        // }
 
         // TODO replace the following two lines with your code that will
         // update the document with a new review.
-        var doc = this.createDummyItem();
-        doc.reviews = [reviewDoc];
+        // var doc = this.createDummyItem();
+        // doc.reviews = [reviewDoc];
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the updated doc to the
         // callback.
-        callback(doc);
+        // callback(doc);
     }
 
 
