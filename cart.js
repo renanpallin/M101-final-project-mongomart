@@ -23,7 +23,7 @@ function CartDAO(database) {
     "use strict";
 
     this.db = database;
-
+    Object.defineProperty(this, 'COLLECTION_NAME', {writable: false, value: "cart"})
 
     this.getCart = function(userId, callback) {
         "use strict";
@@ -37,20 +37,25 @@ function CartDAO(database) {
         * callback function.
         *
         */
+        // var userCart = {
+        //     userId: userId,
+        //     items: []
+        // }
+        // var dummyItem = this.createDummyItem();
+        // userCart.items.push(dummyItem);
 
-        var userCart = {
-            userId: userId,
-            items: []
-        }
-        var dummyItem = this.createDummyItem();
-        userCart.items.push(dummyItem);
+        console.log('entrou no bang');  
+        this.db.collection(this.COLLECTION_NAME).findOne({userId})
+            .then(callback)
+            .catch(console.error); // Usuário nem fica sabendo da merda,
+                                   // o que é ruim...
 
         // TODO-lab5 Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the userCart to the
         // callback.
-        callback(userCart);
+        // callback(userCart);
     }
 
 
