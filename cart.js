@@ -25,6 +25,7 @@ function CartDAO(database) {
     this.db = database;
     Object.defineProperty(this, 'COLLECTION_NAME', {writable: false, value: "cart"})
 
+    /* LAB-05 [OK] */
     this.getCart = function(userId, callback) {
         "use strict";
 
@@ -58,7 +59,7 @@ function CartDAO(database) {
         // callback(userCart);
     }
 
-
+    /* LAB-06 (Challenge)[OK] */
     this.itemInCart = function(userId, itemId, callback) {
         "use strict";
 
@@ -86,8 +87,17 @@ function CartDAO(database) {
          * how cart.itemInCart is used in the mongomart.js app.
          *
          */
-
-        callback(null);
+        // this.db.collection(this.COLLECTION_NAME).find({userId, items: itemId}, {"items.$": true});
+        // console.log("in itemInCart...");
+        this.db.collection(this.COLLECTION_NAME).findOne({userId}, {
+            _id: false,
+            items: {
+                $elemMatch: {
+                    "_id": itemId
+                }
+            }     // [FODA] Se tiver um doc.items, passa doc.items[0], se não, null
+        }).then(doc => callback(doc.items && doc.items[0] || null))
+          .catch(console.error);
 
         // TODO-lab6 Replace all code above (in this method).
     }
